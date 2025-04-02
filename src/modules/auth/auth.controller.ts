@@ -4,12 +4,14 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Patch,
   Post,
 } from '@nestjs/common'
 import { UserId } from 'src/decorators/user-id.decorator'
 import { AuthService } from './auth.service'
 import { LoginDto } from './dto/login.dto'
 import { RegisterDto } from './dto/register.dto'
+import { UpdateProfileDto } from './dto/update-profile.dto'
 
 @Controller('auth')
 export class AuthController {
@@ -37,5 +39,14 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async refreshToken(@UserId() userId: string) {
     return this.authService.refreshToken(userId)
+  }
+
+  @Patch('profile')
+  @HttpCode(HttpStatus.OK)
+  async updateProfile(
+    @UserId() userId: string,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
+    return this.authService.updateProfile(userId, updateProfileDto)
   }
 }

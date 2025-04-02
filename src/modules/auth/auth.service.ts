@@ -22,6 +22,7 @@ import {
   PhoneRegisterDto,
 } from './dto/register.dto'
 import { RegisterDto, RegisterType } from './dto/register.dto'
+import { UpdateProfileDto } from './dto/update-profile.dto'
 
 @Injectable()
 export class AuthService {
@@ -194,5 +195,35 @@ export class AuthService {
     return {
       token: await this.generateTokens(user),
     }
+  }
+
+  async updateProfile(userId: string, updateProfileDto: UpdateProfileDto) {
+    const user = await this.userModel.findOne({ userId })
+    if (!user) {
+      throw new UnauthorizedException('User not found')
+    }
+
+    // Update profile fields
+    if (updateProfileDto.name) {
+      user.profile.name = updateProfileDto.name
+    }
+    if (updateProfileDto.avatar) {
+      user.profile.avatar = updateProfileDto.avatar
+    }
+    if (updateProfileDto.birthday) {
+      user.profile.birthday = updateProfileDto.birthday
+    }
+    if (updateProfileDto.gender) {
+      user.profile.gender = updateProfileDto.gender
+    }
+    if (updateProfileDto.bio) {
+      user.profile.bio = updateProfileDto.bio
+    }
+    if (updateProfileDto.metadata) {
+      user.profile.metadata = updateProfileDto.metadata
+    }
+
+    await user.save()
+    return this.userService.mapUserToResponse(user)
   }
 }
