@@ -1,6 +1,11 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { JwtService } from '@nestjs/jwt'
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -10,34 +15,34 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
-    const path = request.path;
+    const request = context.switchToHttp().getRequest()
+    const path = request.path
 
     // 检查是否在忽略列表中
-    const ignorePaths = this.configService.get<string[]>('auth.ignore') || [];
+    const ignorePaths = this.configService.get<string[]>('auth.ignore') || []
     if (ignorePaths.includes(path)) {
-      return true;
+      return true
     }
 
-    const token = this.extractTokenFromHeader(request);
+    const token = this.extractTokenFromHeader(request)
 
     if (!token) {
-      throw new UnauthorizedException('No token provided');
+      throw new UnauthorizedException('No token provided')
     }
 
     try {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get<string>('auth.jwt.secret'),
-      });
-      request.user = payload;
-      return true;
+      })
+      request.user = payload
+      return true
     } catch {
-      throw new UnauthorizedException('Invalid or expired token');
+      throw new UnauthorizedException('Invalid or expired token')
     }
   }
 
   private extractTokenFromHeader(request: any): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
+    const [type, token] = request.headers.authorization?.split(' ') ?? []
+    return type === 'Bearer' ? token : undefined
   }
-} 
+}

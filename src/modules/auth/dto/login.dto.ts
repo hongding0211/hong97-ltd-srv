@@ -1,45 +1,53 @@
-import { IsEmail, IsString, MinLength, IsPhoneNumber, IsEnum, IsOptional, IsObject, ValidateIf, ValidateNested } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsObject,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  MinLength,
+} from 'class-validator'
 
 export enum LoginType {
   LOCAL = 'local',
   PHONE = 'phone',
-  OAUTH = 'oauth'
+  OAUTH = 'oauth',
 }
 
 export class LocalLoginDto {
   @IsOptional()
   @IsEmail()
-  email?: string;
+  email?: string
 
   @IsOptional()
   @IsPhoneNumber()
-  phoneNumber?: string;
+  phoneNumber?: string
 
   @IsString()
   @MinLength(6)
-  password: string;
+  password: string
 }
 
 export class PhoneLoginDto {
   @IsPhoneNumber()
-  phoneNumber: string;
+  phoneNumber: string
 
   @IsString()
-  verificationCode: string;
+  verificationCode: string
 }
 
 export class OAuthLoginDto {
   @IsString()
-  provider: string;
+  provider: string
 
   @IsString()
-  accessToken: string;
+  accessToken: string
 }
 
 export class LoginDto {
   @IsEnum(LoginType)
-  type: LoginType;
+  type: LoginType
 
   @IsObject()
-  credentials: LocalLoginDto | PhoneLoginDto | OAuthLoginDto;
-} 
+  credentials: LocalLoginDto | PhoneLoginDto | OAuthLoginDto
+}

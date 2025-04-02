@@ -1,14 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User, UserDocument } from '../../schemas/user.schema';
-import { UserResponseDto } from './dto/user.response.dto';
+import { Injectable } from '@nestjs/common'
+import { InjectModel } from '@nestjs/mongoose'
+import { Model } from 'mongoose'
+import { User, UserDocument } from '../../schemas/user.schema'
+import { UserResponseDto } from './dto/user.response.dto'
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
-  ) {}
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   mapUserToResponse(user: UserDocument): UserResponseDto {
     return {
@@ -19,19 +17,19 @@ export class UserService {
         bio: user.profile?.bio,
         metadata: user.profile?.metadata,
       },
-    };
+    }
   }
 
   async findUsersByIds(userIds: string[]): Promise<UserResponseDto[]> {
-    const users = await this.userModel.find({ userId: { $in: userIds } });
-    return users.map(user => this.mapUserToResponse(user));
+    const users = await this.userModel.find({ userId: { $in: userIds } })
+    return users.map((user) => this.mapUserToResponse(user))
   }
 
   async findUserById(userId: string): Promise<UserResponseDto> {
-    const users = await this.findUsersByIds([userId]);
+    const users = await this.findUsersByIds([userId])
     if (!users.length) {
-      throw new Error('User not found');
+      throw new Error('User not found')
     }
-    return users[0];
+    return users[0]
   }
-} 
+}

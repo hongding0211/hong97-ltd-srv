@@ -1,7 +1,7 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { Document } from 'mongoose'
 
-export type UserDocument = User & Document;
+export type UserDocument = User & Document
 
 export enum AuthProvider {
   LOCAL = 'local',
@@ -13,62 +13,61 @@ export enum AuthProvider {
 @Schema({ timestamps: true })
 export class UserProfile {
   @Prop({ required: true })
-  name: string;
+  name: string
 
   @Prop()
-  avatar?: string;
+  avatar?: string
 
   @Prop()
-  birthday?: Date;
+  birthday?: Date
 
   @Prop()
-  gender?: string;
+  gender?: string
 
   @Prop()
-  bio?: string;
+  bio?: string
 
   @Prop({ type: Object })
-  metadata?: Record<string, any>;
+  metadata?: Record<string, any>
 }
 
 @Schema({ timestamps: true })
 export class User {
   @Prop({ required: true, unique: true })
-  userId: string;
+  userId: string
 
   @Prop()
-  password?: string;
+  password?: string
 
   @Prop({ type: UserProfile })
-  profile: UserProfile;
+  profile: UserProfile
 
   @Prop({ type: [{ type: String, enum: AuthProvider }] })
-  authProviders: AuthProvider[];
+  authProviders: AuthProvider[]
 
   @Prop({ type: Object })
   authData: {
     [AuthProvider.LOCAL]?: {
-      email?: string;
-      passwordHash?: string;
-    };
+      email?: string
+      passwordHash?: string
+    }
     [AuthProvider.GITHUB]?: {
-      githubId: string;
-      accessToken?: string;
-    };
+      githubId: string
+      accessToken?: string
+    }
     [AuthProvider.GOOGLE]?: {
-      googleId: string;
-      accessToken?: string;
-    };
+      googleId: string
+      accessToken?: string
+    }
     [AuthProvider.PHONE]?: {
-      phoneNumber: string;
-      isVerified: boolean;
-      lastVerificationTime?: Date;
-    };
-  };
+      phoneNumber: string
+      isVerified: boolean
+      lastVerificationTime?: Date
+    }
+  }
 
   @Prop({ type: Date, default: null })
-  lastLoginAt: Date;
-
+  lastLoginAt: Date
 }
 
-export const UserSchema = SchemaFactory.createForClass(User); 
+export const UserSchema = SchemaFactory.createForClass(User)

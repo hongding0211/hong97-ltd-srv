@@ -1,83 +1,91 @@
-import { IsEmail, IsString, MinLength, IsPhoneNumber, IsEnum, IsObject, IsOptional, ValidateIf, ValidateNested } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsObject,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  MinLength,
+} from 'class-validator'
 
 export enum RegisterType {
   LOCAL = 'local',
   PHONE = 'phone',
-  OAUTH = 'oauth'
+  OAUTH = 'oauth',
 }
 
 export class UserProfileDto {
   @IsString()
-  name: string;
+  name: string
 
   @IsString()
   @IsOptional()
-  avatar?: string;
+  avatar?: string
 
   @IsString()
   @IsOptional()
-  birthday?: string;
+  birthday?: string
 
   @IsString()
   @IsOptional()
-  gender?: string;
+  gender?: string
 
   @IsString()
   @IsOptional()
-  bio?: string;
+  bio?: string
 }
 
 export class LocalRegisterDto {
   @IsOptional()
   @IsEmail()
-  email?: string;
+  email?: string
 
   @IsOptional()
   @IsPhoneNumber()
-  phoneNumber?: string;
+  phoneNumber?: string
 
   @IsString()
   @MinLength(6)
-  password: string;
+  password: string
 
   @IsObject()
-  profile: UserProfileDto;
+  profile: UserProfileDto
 }
 
 export class PhoneRegisterDto {
   @IsPhoneNumber()
-  phoneNumber: string;
+  phoneNumber: string
 
   @IsString()
-  verificationCode: string;
+  verificationCode: string
 
   @IsString()
-  username: string;
+  username: string
 
   @IsObject()
   @IsOptional()
-  profile?: UserProfileDto;
+  profile?: UserProfileDto
 }
 
 export class OAuthRegisterDto {
   @IsString()
-  provider: string;
+  provider: string
 
   @IsString()
-  accessToken: string;
+  accessToken: string
 
   @IsString()
-  username: string;
+  username: string
 
   @IsObject()
   @IsOptional()
-  profile?: UserProfileDto;
+  profile?: UserProfileDto
 }
 
 export class RegisterDto {
   @IsEnum(RegisterType)
-  type: RegisterType;
+  type: RegisterType
 
   @IsObject()
-  credentials: LocalRegisterDto | PhoneRegisterDto | OAuthRegisterDto;
-} 
+  credentials: LocalRegisterDto | PhoneRegisterDto | OAuthRegisterDto
+}

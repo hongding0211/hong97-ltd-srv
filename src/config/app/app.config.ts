@@ -1,4 +1,4 @@
-import { registerAs } from '@nestjs/config';
+import { registerAs } from '@nestjs/config'
 
 export default registerAs('app', () => ({
   name: process.env.APP_NAME || 'hong97-ltd-server',
@@ -8,4 +8,4 @@ export default registerAs('app', () => ({
     enabled: process.env.CORS_ENABLED === 'true',
     origin: process.env.CORS_ORIGIN || '*',
   },
-})); 
+}))

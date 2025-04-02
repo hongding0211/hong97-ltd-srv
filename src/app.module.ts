@@ -1,13 +1,13 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
-import { JwtModule } from '@nestjs/jwt';
-import { APP_GUARD } from '@nestjs/core';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import config from './config';
-import { AuthModule } from './modules/auth/auth.module';
-import { AuthGuard } from './guards/auth.guard';
+import { Module } from '@nestjs/common'
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import { APP_GUARD } from '@nestjs/core'
+import { JwtModule } from '@nestjs/jwt'
+import { MongooseModule } from '@nestjs/mongoose'
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
+import config from './config'
+import { AuthGuard } from './guards/auth.guard'
+import { AuthModule } from './modules/auth/auth.module'
 
 @Module({
   imports: [
