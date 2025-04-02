@@ -4,7 +4,6 @@ import { Model } from 'mongoose';
 import { User, UserDocument, AuthProvider } from '../../schemas/user.schema';
 import { LocalRegisterDto, PhoneRegisterDto, OAuthRegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { TokenResponseDto } from './dto/token.dto';
 import { UserResponseDto } from './dto/user.response.dto';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
@@ -106,25 +105,6 @@ export class AuthService {
     }
   }
 
-  private async generateTokens(user: UserDocument): Promise<TokenResponseDto> {
-    if (!user.userId) {
-      throw new UnauthorizedException('User ID not found');
-    }
-
-    const payload = { sub: user.userId };
-    const accessToken = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: '7d',
-    });
-
-    return {
-      accessToken,
-      refreshToken,
-      expiresIn: 3600, // 1 hour in seconds
-      tokenType: 'Bearer',
-    };
-  }
-
   private mapUserToResponse(user: UserDocument): UserResponseDto {
     if (!user.profile?.name) {
       throw new UnauthorizedException('User profile name is required');
@@ -140,27 +120,6 @@ export class AuthService {
       lastLoginAt: user.lastLoginAt,
       settings: user.settings,
     };
-  }
-
-  async refreshToken(refreshToken: string): Promise<TokenResponseDto> {
-    try {
-      const payload = await this.jwtService.verifyAsync(refreshToken, {
-        secret: this.configService.get<string>('auth.jwt.secret'),
-      });
-
-      if (payload.type !== 'refresh') {
-        throw new UnauthorizedException('Invalid token type');
-      }
-
-      const user = await this.userModel.findOne({ userId: payload.sub });
-      if (!user) {
-        throw new UnauthorizedException('User not found');
-      }
-
-      return this.generateTokens(user);
-    } catch (error) {
-      throw new UnauthorizedException('Invalid refresh token');
-    }
   }
 
   private async loginWithLocal(credentials: LocalLoginDto) {
@@ -194,7 +153,6 @@ export class AuthService {
     user.lastLoginAt = new Date();
     await user.save();
 
-    const tokens = await this.generateTokens(user);
     return this.mapUserToResponse(user);
   }
 
