@@ -4,7 +4,6 @@ import { Model } from 'mongoose';
 import { User, UserDocument, AuthProvider } from '../../schemas/user.schema';
 import { LocalRegisterDto, PhoneRegisterDto, OAuthRegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { UserResponseDto } from './dto/user.response.dto';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import { JwtService } from '@nestjs/jwt';
@@ -12,6 +11,7 @@ import { ConfigService } from '@nestjs/config';
 import { LocalLoginDto, PhoneLoginDto, OAuthLoginDto } from './dto/login.dto';
 import { LoginType } from './dto/login.dto';
 import { RegisterDto, RegisterType } from './dto/register.dto';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +19,7 @@ export class AuthService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private userService: UserService,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -79,7 +80,7 @@ export class AuthService {
     });
 
     await user.save();
-    return this.mapUserToResponse(user);
+    return this.userService.mapUserToResponse(user)
   }
 
   private async registerWithPhone(credentials: PhoneRegisterDto) {
@@ -116,23 +117,6 @@ export class AuthService {
     });
 
     return accessToken;
-  }
-
-  private mapUserToResponse(user: UserDocument): UserResponseDto {
-    if (!user.profile?.name) {
-      throw new UnauthorizedException('User profile name is required');
-    }
-
-    return {
-      userId: user.userId,
-      profile: {
-        name: user.profile.name,
-        avatar: user.profile?.avatar,
-        bio: user.profile?.bio,
-      },
-      lastLoginAt: user.lastLoginAt,
-      settings: user.settings,
-    };
   }
 
   private async loginWithLocal(credentials: LocalLoginDto) {
@@ -177,5 +161,28 @@ export class AuthService {
 
   private async loginWithOAuth(credentials: OAuthLoginDto) {
     throw new NotImplementedException('OAuth login is not implemented');
+  }
+
+  private extractTokenFromHeader(request: any): string | undefined {
+    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    return type === 'Bearer' ? token : undefined;
+  }
+
+  async info(userId: string) {
+    const user = await this.userModel.findOne({ userId });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    return this.userService.mapUserToResponse(user);
+  }
+
+  async refreshToken(userId: string) {
+    const user = await this.userModel.findOne({ userId });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    return {
+      token: await this.generateTokens(user),
+    };
   }
 } 

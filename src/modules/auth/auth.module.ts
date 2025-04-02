@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { User, UserSchema } from '../../schemas/user.schema';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { User, UserSchema } from '../../schemas/user.schema';
       }),
       inject: [ConfigService],
     }),
+    UserModule
   ],
   controllers: [AuthController],
   providers: [AuthService],

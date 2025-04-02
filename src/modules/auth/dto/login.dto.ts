@@ -1,4 +1,3 @@
-import { Type } from 'class-transformer';
 import { IsEmail, IsString, MinLength, IsPhoneNumber, IsEnum, IsOptional, IsObject, ValidateIf, ValidateNested } from 'class-validator';
 
 export enum LoginType {

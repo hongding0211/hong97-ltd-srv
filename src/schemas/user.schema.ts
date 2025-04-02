@@ -12,8 +12,8 @@ export enum AuthProvider {
 
 @Schema({ timestamps: true })
 export class UserProfile {
-  @Prop()
-  name?: string;
+  @Prop({ required: true })
+  name: string;
 
   @Prop()
   avatar?: string;
@@ -66,19 +66,9 @@ export class User {
     };
   };
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'App' }] })
-  apps: Types.ObjectId[];
-
   @Prop({ type: Date, default: null })
   lastLoginAt: Date;
 
-  @Prop({ type: Object })
-  settings: {
-    emailNotifications?: boolean;
-    twoFactorEnabled?: boolean;
-    language?: string;
-    timezone?: string;
-  };
 }
 
 export const UserSchema = SchemaFactory.createForClass(User); 
