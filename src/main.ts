@@ -15,9 +15,6 @@ async function bootstrap() {
   const appConfig = configService.get('app');
   const corsConfig = configService.get('app.cors');
 
-  // 设置全局前缀
-  app.setGlobalPrefix(`${appConfig.api.prefix}/${appConfig.api.version}`);
-
   // 配置 CORS
   if (corsConfig.enabled) {
     app.enableCors({
@@ -37,6 +34,5 @@ async function bootstrap() {
   const port = appConfig.port;
   await app.listen(port);
   console.log(`Application is running on: http://localhost:${port}`);
-  console.log(`API Documentation available at: http://localhost:${port}/${appConfig.api.prefix}/${appConfig.api.version}`);
 }
 bootstrap();

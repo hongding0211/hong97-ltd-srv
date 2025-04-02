@@ -105,6 +105,19 @@ export class AuthService {
     }
   }
 
+  private async generateTokens(user: UserDocument): Promise<string> {
+    if (!user.userId) {
+      throw new UnauthorizedException('User ID not found');
+    }
+
+    const payload = { sub: user.userId };
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: this.configService.get<number>('auth.jwt.expiresIn'),
+    });
+
+    return accessToken;
+  }
+
   private mapUserToResponse(user: UserDocument): UserResponseDto {
     if (!user.profile?.name) {
       throw new UnauthorizedException('User profile name is required');
@@ -153,7 +166,9 @@ export class AuthService {
     user.lastLoginAt = new Date();
     await user.save();
 
-    return this.mapUserToResponse(user);
+    return {
+      token: await this.generateTokens(user),
+    };
   }
 
   private async loginWithPhone(credentials: PhoneLoginDto) {
