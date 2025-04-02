@@ -1,5 +1,5 @@
-import { IsEmail, IsString, MinLength, IsPhoneNumber, IsEnum, IsOptional, IsObject, ValidateIf } from 'class-validator';
-import { BadRequestException } from '@nestjs/common';
+import { Type } from 'class-transformer';
+import { IsEmail, IsString, MinLength, IsPhoneNumber, IsEnum, IsOptional, IsObject, ValidateIf, ValidateNested } from 'class-validator';
 
 export enum LoginType {
   LOCAL = 'local',
@@ -19,11 +19,6 @@ export class LocalLoginDto {
   @IsString()
   @MinLength(6)
   password: string;
-
-  @ValidateIf((o) => !o.email && !o.phoneNumber)
-  @IsString()
-  @MinLength(1)
-  dummy?: string;
 }
 
 export class PhoneLoginDto {
@@ -47,23 +42,5 @@ export class LoginDto {
   type: LoginType;
 
   @IsObject()
-  @ValidateIf((o) => {
-    switch (o.type) {
-      case LoginType.LOCAL:
-        return o.credentials && typeof o.credentials === 'object' && 
-               ('email' in o.credentials || 'phoneNumber' in o.credentials) && 
-               'password' in o.credentials;
-      case LoginType.PHONE:
-        return o.credentials && typeof o.credentials === 'object' && 
-               'phoneNumber' in o.credentials && 
-               'verificationCode' in o.credentials;
-      case LoginType.OAUTH:
-        return o.credentials && typeof o.credentials === 'object' && 
-               'provider' in o.credentials && 
-               'accessToken' in o.credentials;
-      default:
-        return false;
-    }
-  })
   credentials: LocalLoginDto | PhoneLoginDto | OAuthLoginDto;
 } 

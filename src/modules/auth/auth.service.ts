@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, ConflictException, BadRequestException, UnauthorizedException, NotImplementedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument, AuthProvider } from '../../schemas/user.schema';
@@ -40,9 +40,8 @@ export class AuthService {
   private async registerWithLocal(credentials: LocalRegisterDto) {
     const { email, phoneNumber, password, profile } = credentials;
 
-    // 验证必须提供 email 或 phoneNumber
     if (!email && !phoneNumber) {
-      throw new BadRequestException('Either email or phone number must be provided');
+      throw new BadRequestException('Email or phone number is required');
     }
 
     // 检查邮箱是否已存在
@@ -85,78 +84,11 @@ export class AuthService {
   }
 
   private async registerWithPhone(credentials: PhoneRegisterDto) {
-    const { phoneNumber, verificationCode, username, profile } = credentials;
-
-    // TODO: 验证手机验证码
-    // await this.verifyPhoneCode(phoneNumber, verificationCode);
-
-    const existingUser = await this.userModel.findOne({
-      'authData.phone.phoneNumber': phoneNumber,
-    });
-
-    if (existingUser) {
-      throw new ConflictException('Phone number already exists');
-    }
-
-    const existingUsername = await this.userModel.findOne({ username });
-    if (existingUsername) {
-      throw new ConflictException('Username already exists');
-    }
-
-    const user = new this.userModel({
-      userId: uuidv4(),
-      username,
-      profile,
-      authProviders: [AuthProvider.PHONE],
-      authData: {
-        [AuthProvider.PHONE]: {
-          phoneNumber,
-          isVerified: true,
-          lastVerificationTime: new Date(),
-        },
-      },
-      isActive: true,
-    });
-
-    await user.save();
-    return this.mapUserToResponse(user);
+    throw new NotImplementedException('Phone registration is not implemented');
   }
 
   private async registerWithOAuth(credentials: OAuthRegisterDto) {
-    const { provider, accessToken, username, profile } = credentials;
-
-    // TODO: 验证 OAuth token 并获取用户信息
-    // const oauthUserInfo = await this.verifyOAuthToken(provider, accessToken);
-
-    const existingUsername = await this.userModel.findOne({ username });
-    if (existingUsername) {
-      throw new ConflictException('Username already exists');
-    }
-
-    const existingUser = await this.userModel.findOne({
-      [`authData.${provider.toLowerCase()}.${provider.toLowerCase()}Id`]: accessToken,
-    });
-
-    if (existingUser) {
-      throw new ConflictException(`${provider} account already exists`);
-    }
-
-    const user = new this.userModel({
-      userId: uuidv4(),
-      username,
-      profile,
-      authProviders: [provider],
-      authData: {
-        [provider.toLowerCase()]: {
-          [`${provider.toLowerCase()}Id`]: accessToken,
-          accessToken,
-        },
-      },
-      isActive: true,
-    });
-
-    await user.save();
-    return this.mapUserToResponse(user);
+    throw new NotImplementedException('OAuth registration is not implemented');
   }
 
   async login(loginDto: LoginDto) {
@@ -205,9 +137,7 @@ export class AuthService {
         avatar: user.profile?.avatar,
         bio: user.profile?.bio,
       },
-      isActive: user.isActive,
       lastLoginAt: user.lastLoginAt,
-      lastActiveAt: user.lastActiveAt,
       settings: user.settings,
     };
   }
@@ -236,9 +166,8 @@ export class AuthService {
   private async loginWithLocal(credentials: LocalLoginDto) {
     const { email, phoneNumber, password } = credentials;
 
-    // 验证必须提供 email 或 phoneNumber
     if (!email && !phoneNumber) {
-      throw new BadRequestException('Either email or phone number must be provided');
+      throw new BadRequestException('Email or phone number is required');
     }
 
     // 构建查询条件
@@ -263,65 +192,17 @@ export class AuthService {
 
     // 更新最后登录时间
     user.lastLoginAt = new Date();
-    user.lastActiveAt = new Date();
     await user.save();
 
     const tokens = await this.generateTokens(user);
-    return {
-      tokens,
-      user: this.mapUserToResponse(user),
-    };
+    return this.mapUserToResponse(user);
   }
 
   private async loginWithPhone(credentials: PhoneLoginDto) {
-    const { phoneNumber, verificationCode } = credentials;
-
-    // TODO: 验证手机验证码
-    // await this.verifyPhoneCode(phoneNumber, verificationCode);
-
-    const user = await this.userModel.findOne({
-      'authData.phone.phoneNumber': phoneNumber,
-    });
-
-    if (!user || !user.authData?.phone?.isVerified) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    // 更新最后登录时间
-    user.lastLoginAt = new Date();
-    user.lastActiveAt = new Date();
-    await user.save();
-
-    const tokens = await this.generateTokens(user);
-    return {
-      tokens,
-      user: this.mapUserToResponse(user),
-    };
+    throw new NotImplementedException('Phone login is not implemented');
   }
 
   private async loginWithOAuth(credentials: OAuthLoginDto) {
-    const { provider, accessToken } = credentials;
-
-    // TODO: 验证 OAuth token 并获取用户信息
-    // const oauthUserInfo = await this.verifyOAuthToken(provider, accessToken);
-
-    const user = await this.userModel.findOne({
-      [`authData.${provider.toLowerCase()}.${provider.toLowerCase()}Id`]: accessToken,
-    });
-
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    // 更新最后登录时间
-    user.lastLoginAt = new Date();
-    user.lastActiveAt = new Date();
-    await user.save();
-
-    const tokens = await this.generateTokens(user);
-    return {
-      tokens,
-      user: this.mapUserToResponse(user),
-    };
+    throw new NotImplementedException('OAuth login is not implemented');
   }
 } 

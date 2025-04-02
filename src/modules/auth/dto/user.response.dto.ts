@@ -7,8 +7,6 @@ export class UserProfileResponseDto {
 export class UserResponseDto {
   userId: string;
   profile: UserProfileResponseDto;
-  isActive: boolean;
   lastLoginAt?: Date;
-  lastActiveAt?: Date;
   settings?: Record<string, any>;
 } 

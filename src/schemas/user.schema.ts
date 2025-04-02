@@ -66,17 +66,11 @@ export class User {
     };
   };
 
-  @Prop({ default: false })
-  isActive: boolean;
-
   @Prop({ type: [{ type: Types.ObjectId, ref: 'App' }] })
   apps: Types.ObjectId[];
 
   @Prop({ type: Date, default: null })
   lastLoginAt: Date;
-
-  @Prop({ type: Date, default: null })
-  lastActiveAt: Date;
 
   @Prop({ type: Object })
   settings: {

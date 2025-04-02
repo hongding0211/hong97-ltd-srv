@@ -1,5 +1,5 @@
-import { IsEmail, IsString, MinLength, IsPhoneNumber, IsEnum, IsObject, IsOptional, ValidateIf } from 'class-validator';
-import { BadRequestException } from '@nestjs/common';
+import { IsEmail, IsString, MinLength, IsPhoneNumber, IsEnum, IsObject, IsOptional, ValidateIf, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export enum RegisterType {
   LOCAL = 'local',
