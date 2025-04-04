@@ -174,11 +174,6 @@ export class AuthService {
     throw new NotImplementedException('OAuth login is not implemented')
   }
 
-  private extractTokenFromHeader(request: any): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? []
-    return type === 'Bearer' ? token : undefined
-  }
-
   async info(userId: string) {
     const user = await this.userModel.findOne({ userId })
     if (!user) {

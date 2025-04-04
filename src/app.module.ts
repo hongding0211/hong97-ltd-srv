@@ -8,6 +8,8 @@ import { AppService } from './app.service'
 import config from './config'
 import { AuthGuard } from './guards/auth.guard'
 import { AuthModule } from './modules/auth/auth.module'
+import { OssModule } from './modules/oss/oss.module'
+import { UserModule } from './modules/user/user.module'
 
 @Module({
   imports: [
@@ -31,7 +33,12 @@ import { AuthModule } from './modules/auth/auth.module'
       }),
       inject: [ConfigService],
     }),
+    /** Global Modules */
+
+    UserModule,
+    /** General Modules */
     AuthModule,
+    OssModule,
   ],
   controllers: [AppController],
   providers: [
