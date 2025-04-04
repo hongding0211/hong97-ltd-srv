@@ -3,10 +3,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { APP_GUARD } from '@nestjs/core'
 import { JwtModule } from '@nestjs/jwt'
 import { MongooseModule } from '@nestjs/mongoose'
+import { ThrottlerModule } from '@nestjs/throttler'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import config from './config'
 import { AuthGuard } from './guards/auth.guard'
+import { CustomThrottleGuard } from './guards/throttle'
 import { AuthModule } from './modules/auth/auth.module'
 import { OssModule } from './modules/oss/oss.module'
 import { UserModule } from './modules/user/user.module'
@@ -33,8 +35,19 @@ import { UserModule } from './modules/user/user.module'
       }),
       inject: [ConfigService],
     }),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        return [
+          {
+            ttl: configService.get('rateLimit.ttl') ?? 60000,
+            limit: configService.get('rateLimit.limit') ?? 10,
+          },
+        ]
+      },
+    }),
     /** Global Modules */
-
     UserModule,
     /** General Modules */
     AuthModule,
@@ -46,6 +59,10 @@ import { UserModule } from './modules/user/user.module'
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: CustomThrottleGuard,
     },
   ],
 })
