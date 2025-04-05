@@ -16,6 +16,7 @@ import { UserService } from '../user/user.service'
 import { LoginDto } from './dto/login.dto'
 import { LocalLoginDto, OAuthLoginDto, PhoneLoginDto } from './dto/login.dto'
 import { LoginType } from './dto/login.dto'
+import { ModifyPasswordDto } from './dto/modify-password.dto'
 import {
   LocalRegisterDto,
   OAuthRegisterDto,
@@ -219,6 +220,40 @@ export class AuthService {
     }
 
     await user.save()
+    return this.userService.mapUserToResponse(user)
+  }
+
+  async modifyPassword(modifyPasswordDto: ModifyPasswordDto) {
+    const { email, phoneNumber, originalPassword, newPassword } =
+      modifyPasswordDto
+
+    if (!email && !phoneNumber) {
+      throw new BadRequestException('Email or phone number is required')
+    }
+
+    const user = await this.userModel.findOne({
+      $or: [
+        { 'authData.local.email': email },
+        { 'authData.local.phoneNumber': phoneNumber },
+      ],
+    })
+
+    if (!user || !user.authData?.local?.passwordHash) {
+      throw new UnauthorizedException('Invalid credentials')
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      originalPassword,
+      user.authData.local.passwordHash,
+    )
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials')
+    }
+
+    user.authData.local.passwordHash = await bcrypt.hash(newPassword, 10)
+    await user.save()
+
     return this.userService.mapUserToResponse(user)
   }
 }

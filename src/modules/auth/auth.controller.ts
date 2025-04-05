@@ -10,6 +10,7 @@ import {
 import { UserId } from 'src/decorators/user-id.decorator'
 import { AuthService } from './auth.service'
 import { LoginDto } from './dto/login.dto'
+import { ModifyPasswordDto } from './dto/modify-password.dto'
 import { RegisterDto } from './dto/register.dto'
 import { UpdateProfileDto } from './dto/update-profile.dto'
 
@@ -48,5 +49,11 @@ export class AuthController {
     @Body() updateProfileDto: UpdateProfileDto,
   ) {
     return this.authService.updateProfile(userId, updateProfileDto)
+  }
+
+  @Post('modifyPassword')
+  @HttpCode(HttpStatus.OK)
+  async modifyPassword(@Body() modifyPasswordDto: ModifyPasswordDto) {
+    return this.authService.modifyPassword(modifyPasswordDto)
   }
 }
