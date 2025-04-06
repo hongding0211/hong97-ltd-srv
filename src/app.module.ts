@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { APP_GUARD } from '@nestjs/core'
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core'
 import { JwtModule } from '@nestjs/jwt'
 import { MongooseModule } from '@nestjs/mongoose'
 import { ThrottlerModule } from '@nestjs/throttler'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
+import { StructuredResponseInterceptor } from './common/error/structured-response'
 import config from './config'
 import { AuthGuard } from './guards/auth.guard'
 import { CustomThrottleGuard } from './guards/throttle'
@@ -63,6 +64,10 @@ import { UserModule } from './modules/user/user.module'
     {
       provide: APP_GUARD,
       useClass: CustomThrottleGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: StructuredResponseInterceptor,
     },
   ],
 })
